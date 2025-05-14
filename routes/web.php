@@ -15,7 +15,7 @@ Route::middleware(['auth', 'admin'])->group(function () {
 
 // Rute halaman landing atau beranda
 Route::get('/', function () {
-    return view('home'); // Ganti sesuai kebutuhan
+    return redirect()->route('login');
 })->name('landing');
 
 // Rute yang memerlukan login (auth)
