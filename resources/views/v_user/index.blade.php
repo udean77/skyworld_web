@@ -9,7 +9,8 @@
     <div class="alert alert-success">{{ session('success') }}</div>
 @endif
 
-<table class="table table-bordered">
+<div style="overflow:auto; max-height:70vh;">
+<table class="table table-bordered" style="min-width:700px;">
     <thead>
         <tr>
             <th>Nama</th>
@@ -23,7 +24,7 @@
         <tr>
             <td>{{ $u->name }}</td>
             <td>{{ $u->email }}</td>
-            <td>{{ $u->role }}</td>
+            <td>{{ $u->role->nama_role ?? '-' }}</td>
             <td>
                 <a href="{{ route('users.edit', $u->id) }}" class="btn btn-sm btn-warning">Edit</a>
                 <form action="{{ route('users.destroy', $u->id) }}" method="POST" class="d-inline" onsubmit="return confirm('Yakin hapus user?')">
@@ -35,5 +36,6 @@
         @endforeach
     </tbody>
 </table>
+</div>
 
 @endsection
