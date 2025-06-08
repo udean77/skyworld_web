@@ -49,4 +49,13 @@ class User extends Authenticatable
     {
         return $this->belongsTo(\App\Models\Role::class);
     }
+    
+    public function isAdmin() {
+        return $this->role && in_array($this->role->nama_role, ['admin', 'superadmin', 'manager']);
+    }
+
+    public function customer()
+    {
+        return $this->hasOne(\App\Models\Customer::class, 'email', 'email');
+    }
 }

@@ -24,10 +24,15 @@ class LoginController extends Controller
      */
     protected function authenticated(Request $request, $user)
     {
-        if ($user->role === 'admin') {
+        // Redirect berdasarkan role_id
+        if ($user->role_id == 1) { // superadmin
+            return redirect()->route('dashboard');
+        } elseif ($user->role_id == 2) { // admin
+            return redirect()->route('dashboard');
+        } elseif ($user->role_id == 3) { // manajer
             return redirect()->route('dashboard');
         }
-
-        return redirect()->route('wahana.index');
+        // Jika login sebagai customer (pengunjung), redirect ke beranda customer
+        return redirect()->route('customer.beranda');
     }
 }

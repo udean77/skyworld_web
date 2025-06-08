@@ -12,6 +12,7 @@ return new class extends Migration {
             $table->string('nama');
             $table->string('email')->unique();
             $table->string('no_telp')->nullable();
+            $table->string('password'); // tambahkan kolom password untuk customer login
             $table->timestamps();
         });
     }

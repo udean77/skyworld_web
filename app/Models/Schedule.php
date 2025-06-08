@@ -1,18 +1,22 @@
 <?php
+
 namespace App\Models;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 
-class Customer extends Model
+class Schedule extends Model
 {
     use HasFactory;
+
     protected $fillable = [
-        'kode_customer', 'nama', 'email', 'no_telp', 'password'
+        'wahana_id',
+        'start_time',
+        'end_time',
     ];
 
-    public function transaksis()
+    public function wahana()
     {
-        return $this->hasMany(\App\Models\Transaksi::class);
+        return $this->belongsTo(Wahana::class);
     }
 }
