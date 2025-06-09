@@ -70,35 +70,12 @@
                 <option value="{{ $wahana->id }}">{{ $wahana->nama }}</option>
             @endforeach
         </select>
-
-        <label for="schedule_id">Pilih Waktu Bermain</label>
-        <select name="schedule_id" id="schedule_id" required>
-            <option value="">-- Pilih Waktu --</option>
-            {{-- Jadwal akan diisi otomatis --}}
-        </select>
-
         <label for="jumlah_tiket">Jumlah Tiket</label>
         <input type="number" name="jumlah_tiket" id="jumlah_tiket" min="1" placeholder="Masukkan jumlah tiket" required>
 
         <button type="submit" class="btn-buy">Pesan Tiket</button>
     </form>
 </div>
-<script>
-    // Data jadwal per wahana (dikirim dari controller)
-    const schedules = @json($schedulesByWahana);
-    document.getElementById('wahana_id').addEventListener('change', function() {
-        const wahanaId = this.value;
-        const scheduleSelect = document.getElementById('schedule_id');
-        scheduleSelect.innerHTML = '<option value="">-- Pilih Waktu --</option>';
-        if (schedules[wahanaId]) {
-            schedules[wahanaId].forEach(sch => {
-                let waktu = sch.start_time;
-                if (sch.end_time) waktu += ' - ' + sch.end_time;
-                scheduleSelect.innerHTML += `<option value="${sch.id}">${waktu}</option>`;
-            });
-        }
-    });
-</script>
 @endsection
 
 

@@ -1,15 +1,20 @@
 <?php
 namespace App\Models;
 
-use Illuminate\Database\Eloquent\Factories\HasFactory;
-use Illuminate\Database\Eloquent\Model;
+use Illuminate\Foundation\Auth\User as Authenticatable; // <--- ganti ini
+use Illuminate\Notifications\Notifiable;
 
-class Customer extends Model
+class Customer extends Authenticatable
 {
-    use HasFactory;
+    use Notifiable;
+
+    protected $table = 'customers';
+
     protected $fillable = [
         'kode_customer', 'nama', 'email', 'no_telp', 'password'
     ];
+
+    protected $hidden = ['password', 'remember_token'];
 
     public function transaksis()
     {

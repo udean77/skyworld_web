@@ -11,11 +11,11 @@
                 <h3>{{ $wahana->nama }}</h3>
                 <p>{{ $wahana->deskripsi }}</p>
                 <span style="color:#ffe066;font-weight:bold;">Rp {{ number_format($wahana->harga,0,',','.') }}</span><br>
-                @if($isLoggedIn)
-                    <a href="{{ url('/pesan-tiket') }}?wahana_id={{ $wahana->id }}" class="btn-buy" onclick="event.stopPropagation();">BELI TIKET</a>
-                @else
-                    <a href="{{ url('/customer/login') }}?redirect=/pesan-tiket&wahana_id={{ $wahana->id }}" class="btn-buy" onclick="event.stopPropagation();">BELI TIKET</a>
-                @endif
+              @if(auth()->guard('customer')->check())
+    <a href="{{ route('customer.pesan_tiket.form', ['wahana_id' => $wahana->id]) }}" class="btn-buy">BELI TIKET</a>
+@else
+    <a href="{{ route('customer.login') }}" class="btn-buy">Login dulu</a>
+@endif
             </div>
         </div>
     @endforeach

@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 use App\Models\Customer;
 use App\Models\Wahana;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
 
 class CustomerController extends Controller
 {
@@ -76,25 +77,32 @@ class CustomerController extends Controller
     }
 
     // Proses login customer (pengunjung)
-    public function loginCustomer(Request $request)
-    {
-        $request->validate([
-            'email' => 'required|email',
-            'password' => 'required',
-        ]);
-        $customer = \App\Models\Customer::where('email', $request->email)->first();
-        if ($customer && \Hash::check($request->password, $customer->password)) {
-            // Simpan data customer ke session (atau gunakan guard custom jika ingin lebih aman)
-            session(['customer_id' => $customer->id]);
-            return redirect()->route('customer.beranda');
-        }
-        return back()->with('error', 'Email atau password salah!');
+  public function loginCustomer(Request $request)
+{
+    $credentials = $request->only('email', 'password');
+
+    if (Auth::guard('customer')->attempt($credentials)) {
+        // Tambahkan session ID untuk debug
+        session(['customer_id' => Auth::guard('customer')->id()]); // jika kamu masih butuh session
+        return redirect()->route('customer.beranda');
     }
+
+    return back()->with('error', 'Email atau password salah!');
+}    public function logoutCustomer()
+    {
+        Auth::guard('customer')->logout();
+        return redirect()->route('customer.login');
+    }
+
 
     // Beranda customer: tampilkan wahana dinamis
     public function beranda()
     {
         $wahanas = Wahana::all();
         return view('customer.beranda', compact('wahanas'));
+    }
+    public function showLoginForm()
+    {
+        return view('customer.login');
     }
 }

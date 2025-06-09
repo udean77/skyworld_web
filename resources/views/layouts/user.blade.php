@@ -16,14 +16,16 @@
             background-size: cover;
             background-attachment: fixed;
         }
+
         .navbar {
             background: rgba(20, 30, 60, 0.92);
             padding: 0 40px;
             display: flex;
             align-items: center;
             height: 70px;
-            box-shadow: 0 2px 16px rgba(0,0,0,0.18);
+            box-shadow: 0 2px 16px rgba(0, 0, 0, 0.18);
         }
+
         .navbar .logo {
             font-size: 2.5rem;
             font-weight: bold;
@@ -32,6 +34,7 @@
             margin-right: 20px;
             text-shadow: 0 2px 8px #00eaff44;
         }
+
         .navbar .brand {
             color: #fff;
             font-size: 2rem;
@@ -39,13 +42,14 @@
             margin-right: 40px;
             text-shadow: 0 2px 8px #fff2;
         }
+
         .navbar .nav {
             flex: 1;
             display: flex;
             align-items: center;
             justify-content: flex-end;
-            gap: 0;
         }
+
         .navbar .nav a {
             color: #b2e0ff;
             text-decoration: none;
@@ -54,9 +58,12 @@
             font-size: 1rem;
             transition: color 0.2s;
         }
-        .navbar .nav a.active, .navbar .nav a:hover {
+
+        .navbar .nav a.active,
+        .navbar .nav a:hover {
             color: #ffe066;
         }
+
         .main-title {
             color: #ffe066;
             font-size: 2.5rem;
@@ -64,6 +71,7 @@
             margin: 40px 0 30px 60px;
             text-shadow: 0 2px 12px #00eaff44;
         }
+
         .ticket-grid {
             display: grid;
             grid-template-columns: 1fr 1fr;
@@ -71,15 +79,19 @@
             max-width: 1200px;
             margin: 0 auto;
         }
+
         .ticket-card {
             background: rgba(20, 30, 60, 0.92);
             border-radius: 24px;
-            box-shadow: 0 4px 24px rgba(0,0,0,0.18);
+            box-shadow: 0 4px 24px rgba(0, 0, 0, 0.18);
             display: flex;
             align-items: center;
             padding: 32px;
             min-height: 220px;
+            position: relative;
+            padding-bottom: 80px;
         }
+
         .ticket-card img {
             width: 140px;
             height: 140px;
@@ -88,9 +100,11 @@
             margin-right: 32px;
             box-shadow: 0 2px 12px #00eaff44;
         }
+
         .ticket-card .info {
             flex: 1;
         }
+
         .ticket-card .info h3 {
             margin: 0 0 10px 0;
             font-size: 1.5rem;
@@ -98,74 +112,102 @@
             color: #ffe066;
             text-shadow: 0 2px 8px #00eaff44;
         }
-       .ticket-card {
-    position: relative;
-    padding: 24px;
-    border-radius: 16px;
-    background: #203040;
-    padding-bottom: 80px; /* penting agar isi tidak ketindihan tombol */
-}
 
-.ticket-card .btn-buy {
-    position: absolute;
-    bottom: 24px;
-    right: 24px;
-    background: linear-gradient(90deg, #ffe066 0%, #00eaff 100%);
-    color: #222;
-    border: none;
-    border-radius: 24px;
-    padding: 12px 32px;
-    font-weight: bold;
-    font-size: 1rem;
-    cursor: pointer;
-    box-shadow: 0 2px 8px #00eaff44;
-    transition: background 0.2s;
-}
+        .ticket-card .btn-buy {
+            position: absolute;
+            bottom: 24px;
+            right: 24px;
+            background: linear-gradient(90deg, #ffe066 0%, #00eaff 100%);
+            color: #222;
+            border: none;
+            border-radius: 24px;
+            padding: 12px 32px;
+            font-weight: bold;
+            font-size: 1rem;
+            cursor: pointer;
+            box-shadow: 0 2px 8px #00eaff44;
+            transition: background 0.2s;
+        }
+
         .ticket-card .btn-buy:hover {
             background: linear-gradient(90deg, #00eaff 0%, #ffe066 100%);
         }
+
         .ticket-card.purple {
             background: linear-gradient(135deg, #3a1c71 0%, #d76d77 50%, #ffe066 100%);
             color: #fff;
         }
-        .ticket-card.purple .info h3, .ticket-card.purple .info p {
+
+        .ticket-card.purple .info h3,
+        .ticket-card.purple .info p {
             color: #fff;
         }
+
         .ticket-card.purple .btn-buy {
             background: #ffe066;
             color: #222;
         }
+
         @media (max-width: 900px) {
-            .ticket-grid { grid-template-columns: 1fr; }
-            .main-title { margin-left: 20px; }
+            .ticket-grid {
+                grid-template-columns: 1fr;
+            }
+            .main-title {
+                margin-left: 20px;
+            }
         }
+
         @media (max-width: 600px) {
-            .navbar { flex-direction: column; height: auto; padding: 10px 10px; }
-            .main-title { font-size: 1.5rem; margin: 20px 0 20px 10px; }
-            .ticket-card { flex-direction: column; align-items: flex-start; padding: 18px; }
-            .ticket-card img { margin: 0 0 18px 0; width: 100%; height: 120px; }
+            .navbar {
+                flex-direction: column;
+                height: auto;
+                padding: 10px;
+            }
+            .main-title {
+                font-size: 1.5rem;
+                margin: 20px 0 20px 10px;
+            }
+            .ticket-card {
+                flex-direction: column;
+                align-items: flex-start;
+                padding: 18px;
+            }
+            .ticket-card img {
+                margin: 0 0 18px 0;
+                width: 100%;
+                height: 120px;
+            }
         }
     </style>
     @yield('head')
 </head>
 <body>
     <div class="navbar">
-        <span class="logo"><svg width="40" height="40" viewBox="0 0 40 40" fill="none" xmlns="http://www.w3.org/2000/svg"><circle cx="20" cy="20" r="20" fill="#00eaff"/><circle cx="20" cy="20" r="12" fill="#203a43"/><circle cx="28" cy="12" r="3" fill="#ffe066"/><circle cx="12" cy="28" r="2" fill="#fff"/></svg></span>
+        <span class="logo">
+            <svg width="40" height="40" viewBox="0 0 40 40" fill="none" xmlns="http://www.w3.org/2000/svg">
+                <circle cx="20" cy="20" r="20" fill="#00eaff"/>
+                <circle cx="20" cy="20" r="12" fill="#203a43"/>
+                <circle cx="28" cy="12" r="3" fill="#ffe066"/>
+                <circle cx="12" cy="28" r="2" fill="#fff"/>
+            </svg>
+        </span>
         <span class="brand">SKYWORLD</span>
         <div class="nav">
             <a href="/beranda" class="active">Beranda</a>
-             @if(session('customer_id'))
+
+            @if(session('customer_id'))
                 <a href="{{ url('/customer/' . session('customer_id') . '/riwayat') }}">Riwayat</a>
+                <form action="{{ route('customer.logout') }}" method="POST" style="display: inline;">
+                    @csrf
+                    <button type="submit" class="btn btn-danger">Logout</button>
+                </form>
             @else
                 <a href="/customer/login">Riwayat</a>
-            @endif
-            @if(session('customer_id'))
-                <a href="/customer/logout">Keluar</a>
-            @else
                 <a href="/customer/login">Masuk</a>
             @endif
         </div>
     </div>
+
     @yield('content')
 </body>
 </html>

@@ -34,17 +34,29 @@
                         {{ $trx->schedule->start_time ?? '-' }}{{ isset($trx->schedule->end_time) ? ' - ' . $trx->schedule->end_time : '' }}
                     </td>
                     <td style="text-align:center;">
-                        @if(($trx->status->nama_status ?? '') === 'tidak terpakai')
-                            <span style="background:#f5c242;color:#222;padding:4px 14px;border-radius:16px;display:inline-block;font-weight:600;">{{ $trx->status->nama_status }}</span>
-                        @elseif(($trx->status->nama_status ?? '') === 'tiket terpakai')
-                            <span style="background:#4caf50;color:#fff;padding:4px 14px;border-radius:16px;display:inline-block;font-weight:600;">{{ $trx->status->nama_status }}</span>
-                        @else
-                            <span style="background:#eee;color:#888;padding:4px 14px;border-radius:16px;display:inline-block;">{{ $trx->status->nama_status ?? '-' }}</span>
-                        @endif
-                    </td>
-                    <td style="text-align:center;">{{ $trx->created_at->format('d-m-Y H:i') }}</td>
+    @if(($trx->status->nama_status ?? '') === 'tidak terpakai')
+        <span style="background:#f5c242;color:#222;padding:4px 14px;border-radius:16px;display:inline-block;font-weight:600;">
+            {{ $trx->status->nama_status }}
+        </span>
+    @elseif(($trx->status->nama_status ?? '') === 'tiket terpakai')
+        <span style="background:#4caf50;color:#fff;padding:4px 14px;border-radius:16px;display:inline-block;font-weight:600;">
+            {{ $trx->status->nama_status }}
+        </span>
+    @elseif(($trx->status->nama_status ?? '') === 'belum dibayar')
+        <a href="{{ route('customer.transaksi.bayar', $trx->id) }}" style="background:#ff9800;color:#fff;padding:4px 14px;border-radius:16px;display:inline-block;font-weight:600;text-decoration:none;">
+            {{ $trx->status->nama_status }}
+        </a>
+    @else
+        <span style="background:#eee;color:#888;padding:4px 14px;border-radius:16px;display:inline-block;">
+            {{ $trx->status->nama_status ?? '-' }}
+        </span>
+    @endif
+</td>
+                    <td style="text-align:center;">{{ $trx->created_at->format('d M Y H:i') }}</td>
                     <td style="text-align:center;">
-                        <a href="{{ route('customer.invoice', $trx->id) }}" class="btn-buy" style="padding:6px 18px; font-size:0.95rem;">Invoice</a>
+                        <a href="{{ route('customer.transaksi.invoice', $trx->id) }}" class="btn btn-primary" style="padding:4px 14px; background:#007bff; color:#fff; border-radius:16px; text-decoration:none;">
+                            Invoice
+                        </a>
                     </td>
                 </tr>
                 @endforeach

@@ -26,7 +26,7 @@
         <div class="price" style="color:#00eaff; font-weight:bold; font-size:1.2rem; margin-top:10px;">Harga: Rp {{ number_format($wahana->harga, 0, ',', '.') }}</div>
     </div>
     {{-- Tombol beli tiket pojok kanan bawah --}}
-    <a href="{{ url('/pesan-tiket') }}?wahana_id={{ $wahana->id }}" class="btn-buy" style="position:absolute; right:24px; bottom:24px;">BELI TIKET</a>
+    <a href="{{ url('customer/pesan-tiket') }}?wahana_id={{ $wahana->id }}" class="btn-buy" style="position:absolute; right:24px; bottom:24px;">BELI TIKET</a>
 </div>
 
 {{-- Modal zoom --}}
