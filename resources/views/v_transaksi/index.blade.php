@@ -7,6 +7,20 @@
     <div class="alert alert-success">{{ session('success') }}</div>
 @endif
 <div style="overflow:auto; max-height:70vh;">
+    <div class="mb-3">
+    <form method="GET" action="{{ route('transaksis.cetak') }}" target="_blank" class="form-inline">
+        <div class="form-group mr-2">
+            <label for="tanggal_awal">Dari:</label>
+            <input type="date" name="tanggal_awal" class="form-control mx-2" required>
+        </div>
+        <div class="form-group mr-2">
+            <label for="tanggal_akhir">Sampai:</label>
+            <input type="date" name="tanggal_akhir" class="form-control mx-2" required>
+        </div> 
+        <button type="submit" class="btn btn-primary">Cetak Laporan</button>
+    </form>
+</div>
+
 <table class="table table-bordered" style="min-width:1100px;">
     <thead>
         <tr>

@@ -6,6 +6,7 @@ use App\Models\Customer;
 use App\Models\Transaksi;
 use App\Models\Status;
 use Illuminate\Http\Request;
+use PDF;
 
 class TransaksiController extends Controller
 {
@@ -68,5 +69,29 @@ class TransaksiController extends Controller
         $transaksi->status_id = $request->status_id;
         $transaksi->save();
         return redirect()->route('transaksis.index')->with('success', 'Status transaksi berhasil diupdate!');
+    }
+    public function cetakLaporan(Request $request)
+    {
+        $request->validate([
+            'tanggal_awal' => 'required|date',
+            'tanggal_akhir' => 'required|date|after_or_equal:tanggal_awal',
+        ]);
+
+        $transaksis = Transaksi::with(['wahana', 'customer'])
+            ->whereBetween('created_at', [$request->tanggal_awal, $request->tanggal_akhir])
+            ->get();
+
+        $total_pendapatan = $transaksis->reduce(function ($carry, $trx) {
+            return $carry + (($trx->wahana->harga ?? 0) * $trx->jumlah_tiket);
+        }, 0);
+
+        return view('v_transaksi.cetak_laporan', compact('transaksis', 'total_pendapatan'));
+    }
+    public function cetakPdf()
+    {
+        $transaksis = Transaksi::with(['customer', 'wahana', 'status'])->get();
+
+        $pdf = PDF::loadView('v_transaksi.cetak_laporan', compact('transaksis'));
+        return $pdf->download('laporan-transaksi.pdf');
     }
 }

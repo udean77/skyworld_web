@@ -321,12 +321,6 @@ return [
             'icon' => 'fas fa-user-friends',
         ],
         [
-            'text' => 'Pesan Tiket',
-            'url' => 'pesan-tiket',
-            'icon' => 'fas fa-ticket-alt',
-            'can' => 'isAdmin',
-        ],
-        [
             'text' => 'Transaksi',
             'url' => 'transaksis',
             'icon' => 'fas fa-exchange-alt',

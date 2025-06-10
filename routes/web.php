@@ -8,6 +8,7 @@ use App\Http\Controllers\CustomerTransaksiController;
 use Illuminate\Support\Facades\Auth;
 use App\Http\Controllers\CustomerController;
 use App\Http\Controllers\MidtransController;
+use App\Http\Controllers\TransaksiController;
 
 // Auth routes
 Auth::routes();
@@ -17,8 +18,14 @@ Route::middleware(['auth', 'admin'])->group(function () {
 
 // Rute halaman landing atau beranda
 Route::get('/', function () {
-    return redirect()->route('customer.beranda');
-})->name('home');
+    if (auth()->check()) {
+        return redirect()->route('dashboard'); // untuk admin/login biasa
+    } elseif (session()->has('customer_id')) {
+        return redirect()->route('customer.beranda'); // untuk customer yang login
+    } else {
+        return redirect('/login'); // kalau belum login
+    }
+});
 
 // Rute yang memerlukan login (auth)
 Route::middleware(['auth'])->group(function () {
@@ -34,6 +41,9 @@ Route::middleware(['auth'])->group(function () {
 
     // Rute customer management
     Route::resource('customers', App\Http\Controllers\CustomerController::class);
+    // Rute laporan
+    Route::get('/transaksis/cetak', [TransaksiController::class, 'cetakLaporan'])->name('transaksis.cetak');
+    Route::get('/transaksis/cetak-pdf', [TransaksiController::class, 'cetakPdf'])->name('transaksis.cetakPdf');
 });
 
 // Admin routes (superadmin, admin, manager punya hak sama)
