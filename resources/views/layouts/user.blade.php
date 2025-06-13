@@ -196,13 +196,11 @@
             <a href="/beranda" class="active">Beranda</a>
 
             @if(session('customer_id'))
-                <a href="{{ url('/customer/' . session('customer_id') . '/riwayat') }}">Riwayat</a>
+                <a href="{{ url('/customer/' . session('customer_id') . '/riwayat') }}">Riwayat Pesan</a>
                 <form action="{{ route('customer.logout') }}" method="POST" style="display: inline;">
                     @csrf
                     <button type="submit" class="btn btn-danger">Logout</button>
                 </form>
-            @else
-                <a href="/customer/login">Riwayat</a>
                 <a href="/customer/login">Masuk</a>
             @endif
         </div>

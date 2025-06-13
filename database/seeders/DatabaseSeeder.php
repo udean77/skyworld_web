@@ -16,6 +16,6 @@ class DatabaseSeeder extends Seeder
         $this->call(StatusSeeder::class);
         $this->call(UserSeeder::class);
         $this->call(WahanaSeeder::class);
-        $this->call(DummyDataSeeder::class);
+        //$this->call(DummyDataSeeder::class);
     }
 }

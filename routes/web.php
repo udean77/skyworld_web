@@ -94,9 +94,9 @@ Route::middleware(['auth.customer'])->group(function () {
     // Form pemesanan tiket
     Route::get('/customer/pesan-tiket', [CustomerTransaksiController::class, 'form'])->name('customer.pesan_tiket.form');
     Route::post('/customer/pesan-tiket', [CustomerTransaksiController::class, 'pesan'])->name('customer.transaksi.store');
-    Route::get('/customer/{id}/riwayat', [CustomerTransaksiController::class, 'riwayat'])->name('customer.riwayat.withid');
+    Route::get('/customer/{customer_id}/riwayat', [CustomerTransaksiController::class, 'riwayat'])->name('customer.riwayat.withid');
     Route::get('/customer/riwayat', [CustomerTransaksiController::class, 'riwayat'])->name('customer.riwayat');
-    // Cetak invoice
+    
     Route::get('/customer/transaksi/{id}/invoice', [CustomerTransaksiController::class, 'invoice'])->name('customer.transaksi.invoice');
     Route::get('/customer/transaksi/{id}/bayar', [CustomerTransaksiController::class, 'pembayaran'])->name('customer.transaksi.bayar');
     Route::get('/customer/transaksi/{id}/bayar', [CustomerTransaksiController::class, 'bayar'])->name('customer.transaksi.bayar');

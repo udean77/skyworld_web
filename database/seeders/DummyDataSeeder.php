@@ -18,11 +18,6 @@ class DummyDataSeeder extends Seeder
         Wahana::factory()->count(10)->create();
 
         // Buat 3 Status
-        $statuses = [
-            'tidak terpakai',
-            'tiket terpakai',
-            'pending',
-        ];
         foreach ($statuses as $status) {
             Status::firstOrCreate(['nama_status' => $status]);
         }

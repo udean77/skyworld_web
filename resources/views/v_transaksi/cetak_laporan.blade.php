@@ -37,7 +37,7 @@
 
     @php
         $statusSummary = [
-            'tiket terpakai' => 0,
+            'terpakai' => 0,
             'belum dibayar' => 0,
             'pending' => 0,
         ];

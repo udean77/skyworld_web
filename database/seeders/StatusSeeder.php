@@ -13,7 +13,7 @@ class StatusSeeder extends Seeder
             ['nama_status' => 'paid', 'created_at' => now(), 'updated_at' => now()],
             ['nama_status' => 'failed', 'created_at' => now(), 'updated_at' => now()],
             ['nama_status' => 'expired', 'created_at' => now(), 'updated_at' => now()],
-            ['nama_status' => 'belum terpakai', 'created_at' => now(), 'updated_at' => now()],
+            ['nama_status' => 'belum dipakai', 'created_at' => now(), 'updated_at' => now()],
             ['nama_status' => 'terpakai', 'created_at' => now(), 'updated_at' => now()],
         ]);
     }
