@@ -7,6 +7,7 @@ use App\Models\Transaksi;
 use App\Models\Status;
 use Illuminate\Http\Request;
 use PDF;
+use Excel;
 
 class TransaksiController extends Controller
 {
@@ -70,6 +71,13 @@ class TransaksiController extends Controller
         $transaksi->save();
         return redirect()->route('transaksis.index')->with('success', 'Status transaksi berhasil diupdate!');
     }
+
+    public function show($id)
+    {
+        $transaksi = Transaksi::with(['customer', 'wahana', 'status'])->findOrFail($id);
+        return view('v_transaksi.show', compact('transaksi'));
+    }
+
     public function cetakLaporan(Request $request)
     {
         $request->validate([
@@ -77,8 +85,12 @@ class TransaksiController extends Controller
             'tanggal_akhir' => 'required|date|after_or_equal:tanggal_awal',
         ]);
 
-        $transaksis = Transaksi::with(['wahana', 'customer'])
-            ->whereBetween('created_at', [$request->tanggal_awal, $request->tanggal_akhir])
+        // Tambahkan waktu ke tanggal awal dan akhir
+        $tanggal_awal = $request->tanggal_awal . ' 00:00:00';
+        $tanggal_akhir = $request->tanggal_akhir . ' 23:59:59';
+
+        $transaksis = Transaksi::with(['wahana', 'customer', 'status'])
+            ->whereBetween('created_at', [$tanggal_awal, $tanggal_akhir])
             ->get();
 
         $total_pendapatan = $transaksis->reduce(function ($carry, $trx) {
@@ -87,11 +99,61 @@ class TransaksiController extends Controller
 
         return view('v_transaksi.cetak_laporan', compact('transaksis', 'total_pendapatan'));
     }
+
     public function cetakPdf()
     {
         $transaksis = Transaksi::with(['customer', 'wahana', 'status'])->get();
 
         $pdf = PDF::loadView('v_transaksi.cetak_laporan', compact('transaksis'));
         return $pdf->download('laporan-transaksi.pdf');
+    }
+
+    public function cetakExcel(Request $request)
+    {
+        $request->validate([
+            'tanggal_awal' => 'required|date',
+            'tanggal_akhir' => 'required|date|after_or_equal:tanggal_awal',
+        ]);
+
+        // Tambahkan waktu ke tanggal awal dan akhir
+        $tanggal_awal = $request->tanggal_awal . ' 00:00:00';
+        $tanggal_akhir = $request->tanggal_akhir . ' 23:59:59';
+
+        $transaksis = Transaksi::with(['wahana', 'customer', 'status'])
+            ->whereBetween('created_at', [$tanggal_awal, $tanggal_akhir])
+            ->get();
+
+        $data = [];
+        $total_pendapatan = 0;
+
+        foreach ($transaksis as $trx) {
+            $total_harga = ($trx->wahana->harga ?? 0) * $trx->jumlah_tiket;
+            $total_pendapatan += $total_harga;
+
+            $data[] = [
+                'ID' => $trx->id,
+                'Customer' => $trx->customer->nama ?? '-',
+                'Wahana' => $trx->wahana->nama ?? '-',
+                'Harga Tiket' => $trx->wahana->harga ?? 0,
+                'Jumlah Tiket' => $trx->jumlah_tiket,
+                'Total Harga' => $total_harga,
+                'Status' => $trx->status->nama_status ?? '-',
+                'Tanggal' => $trx->created_at->format('d-m-Y H:i')
+            ];
+        }
+
+        // Tambahkan baris total di akhir
+        $data[] = [
+            'ID' => '',
+            'Customer' => '',
+            'Wahana' => '',
+            'Harga Tiket' => '',
+            'Jumlah Tiket' => 'Total Pendapatan:',
+            'Total Harga' => $total_pendapatan,
+            'Status' => '',
+            'Tanggal' => ''
+        ];
+
+        return Excel::download(new \App\Exports\TransaksiExport($data), 'laporan-transaksi.xlsx');
     }
 }

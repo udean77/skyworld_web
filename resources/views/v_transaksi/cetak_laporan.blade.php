@@ -56,7 +56,7 @@
                 $statusSummary[$status]++;
             }
 
-            if ($status === 'tiket terpakai') {
+            if ($status === 'terpakai') {
                 $pendapatanTerpakai += $subtotal;
             }
 

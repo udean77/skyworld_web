@@ -58,7 +58,9 @@ Route::middleware(['auth', 'can:isAdmin'])->group(function () {
     Route::resource('transaksis', App\Http\Controllers\TransaksiController::class)->except(['create', 'store']);
     Route::get('pesan-tiket', [App\Http\Controllers\TransaksiController::class, 'create'])->name('v_transaksi.create');
     Route::post('pesan-tiket', [App\Http\Controllers\TransaksiController::class, 'store'])->name('v_transaksi.store');
-    // Route resource transaksis bisa ditambah jika ingin fitur CRUD penuh
+    Route::get('/transaksis/cetak', [TransaksiController::class, 'cetakLaporan'])->name('transaksis.cetak');
+    Route::get('/transaksis/cetak-pdf', [TransaksiController::class, 'cetakPdf'])->name('transaksis.cetakPdf');
+    Route::get('/transaksis/cetak-excel', [TransaksiController::class, 'cetakExcel'])->name('transaksis.cetak-excel');
 });
 
 // =====================
