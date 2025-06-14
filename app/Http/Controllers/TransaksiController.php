@@ -20,38 +20,73 @@ class TransaksiController extends Controller
     public function store(Request $request)
     {
         $request->validate([
-            'customer_nama' => 'required|string|max:255',
-            'wahana_id' => 'required|exists:wahanas,id',
-            'jumlah_tiket' => 'required|integer|min:1',
+            'kode_customer' => 'required',
+            'wahana_id' => 'required',
+            'jumlah_tiket' => 'required|numeric|min:1',
+            'status_id' => 'required'
         ]);
 
-        // Cari atau buat customer baru
-        $customer = \App\Models\Customer::firstOrCreate(
-            ['nama' => $request->customer_nama],
-            [
-                'kode_customer' => 'CUST-' . strtoupper(uniqid()),
-                'email' => '',
-                'no_telp' => ''
-            ]
-        );
+        $transaksi = Transaksi::create($request->all());
 
-        // Status default: tidak terpakai
-        $status = \App\Models\Status::where('nama_status', 'tidak terpakai')->first();
+        if ($request->ajax()) {
+            return response()->json([
+                'success' => true,
+                'message' => 'Transaksi berhasil ditambahkan!',
+                'data' => $transaksi
+            ]);
+        }
 
-        \App\Models\Transaksi::create([
-            'customer_id' => $customer->id,
-            'wahana_id' => $request->wahana_id,
-            'status_id' => $status ? $status->id : 1,
-            'jumlah_tiket' => $request->jumlah_tiket,
-        ]);
-
-        return redirect()->route('transaksis.create')->with('success', 'Pesanan tiket berhasil dibuat!');
+        return redirect()->route('transaksis.index')
+            ->with('success', 'Transaksi berhasil ditambahkan!');
     }
 
-    public function index()
+    public function index(Request $request)
     {
-        $transaksis = Transaksi::with(['customer', 'wahana', 'status'])->get();
-        return view('v_transaksi.index', compact('transaksis'));
+        $query = Transaksi::with(['customer', 'wahana', 'status']);
+
+        // Filter berdasarkan status
+        if ($request->has('status') && $request->status != '') {
+            $query->whereHas('status', function($q) use ($request) {
+                $q->where('nama_status', $request->status);
+            });
+        }
+
+        // Filter berdasarkan wahana
+        if ($request->has('wahana') && $request->wahana != '') {
+            $query->where('wahana_id', $request->wahana);
+        }
+
+        // Filter berdasarkan tanggal
+        if ($request->has('tanggal_awal') && $request->tanggal_awal != '') {
+            $query->whereDate('created_at', '>=', $request->tanggal_awal);
+        }
+        if ($request->has('tanggal_akhir') && $request->tanggal_akhir != '') {
+            $query->whereDate('created_at', '<=', $request->tanggal_akhir);
+        }
+
+        // Filter berdasarkan pencarian
+        if ($request->has('search') && $request->search != '') {
+            $search = $request->search;
+            $query->where(function($q) use ($search) {
+                $q->where('transaksi_id', 'like', "%{$search}%")
+                  ->orWhereHas('customer', function($q) use ($search) {
+                      $q->where('nama', 'like', "%{$search}%");
+                  })
+                  ->orWhereHas('wahana', function($q) use ($search) {
+                      $q->where('nama', 'like', "%{$search}%");
+                  });
+            });
+        }
+
+        $transaksis = $query->latest()->paginate(10);
+        $wahanas = Wahana::all();
+        $statuses = Status::all();
+
+        if ($request->ajax()) {
+            return view('v_transaksi.partials.transactions_table', compact('transaksis'));
+        }
+
+        return view('v_transaksi.index', compact('transaksis', 'wahanas', 'statuses'));
     }
 
     public function edit($id)
@@ -61,21 +96,38 @@ class TransaksiController extends Controller
         return view('v_transaksi.edit', compact('transaksi', 'statuses'));
     }
 
-    public function update(Request $request, $id)
+    public function update(Request $request, Transaksi $transaksi)
     {
         $request->validate([
-            'status_id' => 'required|exists:statuses,id',
+            'status_id' => 'required|exists:statuses,id'
         ]);
-        $transaksi = Transaksi::findOrFail($id);
-        $transaksi->status_id = $request->status_id;
-        $transaksi->save();
-        return redirect()->route('transaksis.index')->with('success', 'Status transaksi berhasil diupdate!');
+
+        $transaksi->update([
+            'status_id' => $request->status_id
+        ]);
+
+        if ($request->ajax()) {
+            return response()->json([
+                'success' => true,
+                'message' => 'Status berhasil diperbarui'
+            ]);
+        }
+
+        return redirect()->route('transaksis.index')
+            ->with('success', 'Status transaksi berhasil diperbarui!');
     }
 
     public function show($id)
     {
         $transaksi = Transaksi::with(['customer', 'wahana', 'status'])->findOrFail($id);
         return view('v_transaksi.show', compact('transaksi'));
+    }
+
+    public function laporan()
+    {
+        $wahanas = Wahana::all();
+        $statuses = Status::all();
+        return view('v_transaksi.laporan', compact('wahanas', 'statuses'));
     }
 
     public function cetakLaporan(Request $request)
@@ -89,15 +141,29 @@ class TransaksiController extends Controller
         $tanggal_awal = $request->tanggal_awal . ' 00:00:00';
         $tanggal_akhir = $request->tanggal_akhir . ' 23:59:59';
 
-        $transaksis = Transaksi::with(['wahana', 'customer', 'status'])
-            ->whereBetween('created_at', [$tanggal_awal, $tanggal_akhir])
-            ->get();
+        $query = Transaksi::with(['wahana', 'customer', 'status'])
+            ->whereBetween('created_at', [$tanggal_awal, $tanggal_akhir]);
+
+        // Filter by status
+        if ($request->filled('status')) {
+            $query->whereHas('status', function($q) use ($request) {
+                $q->where('nama_status', $request->status);
+            });
+        }
+
+        // Filter by wahana
+        if ($request->filled('wahana')) {
+            $query->where('wahana_id', $request->wahana);
+        }
+
+        $transaksis = $query->get();
+        $wahanas = Wahana::all(); // Get all wahanas for the filter display
 
         $total_pendapatan = $transaksis->reduce(function ($carry, $trx) {
             return $carry + (($trx->wahana->harga ?? 0) * $trx->jumlah_tiket);
         }, 0);
 
-        return view('v_transaksi.cetak_laporan', compact('transaksis', 'total_pendapatan'));
+        return view('v_transaksi.cetak_laporan', compact('transaksis', 'total_pendapatan', 'wahanas'));
     }
 
     public function cetakPdf()
@@ -155,5 +221,20 @@ class TransaksiController extends Controller
         ];
 
         return Excel::download(new \App\Exports\TransaksiExport($data), 'laporan-transaksi.xlsx');
+    }
+
+    public function destroy(Transaksi $transaksi)
+    {
+        $transaksi->delete();
+
+        if (request()->ajax()) {
+            return response()->json([
+                'success' => true,
+                'message' => 'Transaksi berhasil dihapus!'
+            ]);
+        }
+
+        return redirect()->route('transaksis.index')
+            ->with('success', 'Transaksi berhasil dihapus!');
     }
 }

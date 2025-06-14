@@ -4,51 +4,37 @@ namespace Database\Seeders;
 
 use Illuminate\Database\Seeder;
 use App\Models\Customer;
+use App\Models\Transaksi;
 use App\Models\Wahana;
 use App\Models\Status;
-use App\Models\Transaksi;
-use Illuminate\Support\Str;
 use Carbon\Carbon;
 
 class DummyDataSeeder extends Seeder
 {
     public function run(): void
     {
-        // Buat 10 Wahana
-        Wahana::factory()->count(10)->create();
-
-        // Buat 3 Status
-        foreach ($statuses as $status) {
-            Status::firstOrCreate(['nama_status' => $status]);
-        }
-
         // Buat 50 Customer
         Customer::factory()->count(50)->create();
 
-        // Ambil data untuk digunakan
+        // Data dummy untuk transaksi
         $customers = Customer::all();
         $wahanas = Wahana::all();
-        $statusIds = Status::pluck('id', 'nama_status');
+        $statuses = Status::all();
 
-        // Generate 20 transaksi per hari dari 1-10 Juni 2025
-        for ($day = 1; $day <= 10; $day++) {
-            for ($i = 0; $i < 20; $i++) {
-                $customer = $customers->random();
-                $wahana = $wahanas->random();
-                $statusId = $statusIds->random();
-                $jumlahTiket = rand(1, 5);
-
-                $tanggal = Carbon::create(2025, 6, $day, rand(8, 20), rand(0, 59));
-
-                Transaksi::create([
-                    'customer_id' => $customer->id,
-                    'wahana_id' => $wahana->id,
-                    'status_id' => $statusId,
-                    'jumlah_tiket' => $jumlahTiket,
-                    'created_at' => $tanggal,
-                    'updated_at' => $tanggal,
-                ]);
-            }
+        // Buat 100 transaksi dummy
+        for ($i = 0; $i < 100; $i++) {
+            // Generate tanggal random dalam 3 bulan terakhir
+            $createdAt = Carbon::now()->subDays(rand(0, 90));
+            
+            Transaksi::create([
+                'transaksi_id' => 'TRX-' . str_pad($i + 1, 6, '0', STR_PAD_LEFT),
+                'kode_customer' => $customers->random()->kode_customer,
+                'wahana_id' => $wahanas->random()->id,
+                'jumlah_tiket' => rand(1, 5),
+                'status_id' => $statuses->random()->id,
+                'created_at' => $createdAt,
+                'updated_at' => $createdAt
+            ]);
         }
     }
 }

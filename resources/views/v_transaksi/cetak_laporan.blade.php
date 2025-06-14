@@ -30,16 +30,35 @@
         tfoot td {
             font-weight: bold;
         }
+        .filter-info {
+            text-align: center;
+            margin-bottom: 20px;
+            color: #666;
+            font-style: italic;
+        }
     </style>
 </head>
 <body>
     <h2>Laporan Transaksi Tiket</h2>
 
+    @if(request('status') || request('wahana'))
+    <div class="filter-info">
+        Filter: 
+        @if(request('status'))
+            Status: {{ ucfirst(request('status')) }}
+        @endif
+        @if(request('wahana'))
+            @if(request('status')), @endif
+            Wahana: {{ $wahanas->firstWhere('id', request('wahana'))->nama ?? 'Semua Wahana' }}
+        @endif
+    </div>
+    @endif
+
     @php
         $statusSummary = [
             'terpakai' => 0,
-            'belum dibayar' => 0,
-            'pending' => 0,
+            'belum terpakai' => 0,
+            'dibatalkan' => 0,
         ];
 
         $pendapatanTerpakai = 0;
@@ -59,7 +78,6 @@
             if ($status === 'terpakai') {
                 $pendapatanTerpakai += $subtotal;
             }
-
             $totalPendapatan += $subtotal;
         @endphp
     @endforeach

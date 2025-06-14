@@ -27,9 +27,13 @@ Route::get('/', function () {
     }
 });
 
+// Login routes (harus di atas middleware auth)
+Route::get('/login', [App\Http\Controllers\Auth\LoginController::class, 'showLoginForm'])->name('login');
+Route::post('/login', [App\Http\Controllers\Auth\LoginController::class, 'login']);
+Route::post('/logout', [App\Http\Controllers\Auth\LoginController::class, 'logout'])->name('logout');
+
 // Rute yang memerlukan login (auth)
 Route::middleware(['auth'])->group(function () {
-
     // Rute dashboard
     Route::get('/dashboard', [DashboardController::class, 'index'])->name('dashboard');
 
@@ -41,23 +45,16 @@ Route::middleware(['auth'])->group(function () {
 
     // Rute customer management
     Route::resource('customers', App\Http\Controllers\CustomerController::class);
-    // Rute laporan
-    Route::get('/transaksis/cetak', [TransaksiController::class, 'cetakLaporan'])->name('transaksis.cetak');
-    Route::get('/transaksis/cetak-pdf', [TransaksiController::class, 'cetakPdf'])->name('transaksis.cetakPdf');
 });
 
 // Admin routes (superadmin, admin, manager punya hak sama)
 Route::middleware(['auth', 'admin'])->group(function () {
+    Route::get('/dashboard', [App\Http\Controllers\DashboardController::class, 'index'])->name('dashboard');
     // Rute CRUD wahana (admin hanya bisa akses)
     Route::resource('wahana', WahanaController::class)->except(['index']);
-    // Route users di sini dihapus agar tidak bentrok
-});
-
-// Rute untuk transaksi
-Route::middleware(['auth', 'can:isAdmin'])->group(function () {
-    Route::resource('transaksis', App\Http\Controllers\TransaksiController::class)->except(['create', 'store']);
-    Route::get('pesan-tiket', [App\Http\Controllers\TransaksiController::class, 'create'])->name('v_transaksi.create');
-    Route::post('pesan-tiket', [App\Http\Controllers\TransaksiController::class, 'store'])->name('v_transaksi.store');
+    // Route transaksi untuk admin
+    Route::resource('transaksis', App\Http\Controllers\TransaksiController::class);
+    Route::get('/transaksis/laporan', [TransaksiController::class, 'laporan'])->name('transaksis.laporan');
     Route::get('/transaksis/cetak', [TransaksiController::class, 'cetakLaporan'])->name('transaksis.cetak');
     Route::get('/transaksis/cetak-pdf', [TransaksiController::class, 'cetakPdf'])->name('transaksis.cetakPdf');
     Route::get('/transaksis/cetak-excel', [TransaksiController::class, 'cetakExcel'])->name('transaksis.cetak-excel');
@@ -82,7 +79,7 @@ Route::post('/customer/register', [CustomerController::class, 'registerStore'])-
 Route::get('/beranda', [CustomerController::class, 'beranda'])->name('customer.beranda');
 
 // Halaman Detail Wahana
-Route::get('/wahana/{id}/detail', function ($id) {
+Route::get('/wahana/{id}', function ($id) {
     $wahana = \App\Models\Wahana::findOrFail($id);
     return view('customer.wahana_detail', compact('wahana'));
 })->name('customer.wahana.detail');
@@ -92,7 +89,6 @@ Route::get('/wahana/{id}/detail', function ($id) {
 // Middleware: auth.customer (custom middleware pakai session `customer_id`)
 // =====================
 Route::middleware(['auth.customer'])->group(function () {
-
     // Form pemesanan tiket
     Route::get('/customer/pesan-tiket', [CustomerTransaksiController::class, 'form'])->name('customer.pesan_tiket.form');
     Route::post('/customer/pesan-tiket', [CustomerTransaksiController::class, 'pesan'])->name('customer.transaksi.store');
@@ -103,7 +99,6 @@ Route::middleware(['auth.customer'])->group(function () {
     Route::get('/customer/transaksi/{id}/bayar', [CustomerTransaksiController::class, 'pembayaran'])->name('customer.transaksi.bayar');
     Route::get('/customer/transaksi/{id}/bayar', [CustomerTransaksiController::class, 'bayar'])->name('customer.transaksi.bayar');
     Route::post('/midtrans/notification', [MidtransController::class, 'notificationHandler']);
-
 
     // Logout customer
     Route::post('/customer/logout', function () {

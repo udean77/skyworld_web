@@ -19,12 +19,14 @@ class CustomerFactory extends Factory
 
     public function definition(): array
     {
+        static $counter = 1;
+        
         return [
-            'nama' => $this->faker->name,
-            'kode_customer' => 'CUST-' . strtoupper($this->faker->unique()->bothify('###??')),
-            'email' => $this->faker->safeEmail,
-            'no_telp' => $this->faker->phoneNumber,
-            'password' => bcrypt('password123')
+            'kode_customer' => 'CUST' . str_pad($counter++, 3, '0', STR_PAD_LEFT),
+            'nama' => $this->faker->name(),
+            'email' => $this->faker->unique()->safeEmail(),
+            'no_telp' => $this->faker->phoneNumber(),
+            'password' => bcrypt('password123'), // password default
         ];
     }
 }

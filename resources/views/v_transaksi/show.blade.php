@@ -38,10 +38,12 @@
                         <tr>
                             <th>Status</th>
                             <td>
-                                @if(($transaksi->status->nama_status ?? '') === 'tidak terpakai')
+                                @if(($transaksi->status->nama_status ?? '') === 'belum terpakai')
                                     <span style="background-color:#f8d7da;color:#721c24;padding:4px 10px;border-radius:5px;display:inline-block;">{{ $transaksi->status->nama_status }}</span>
-                                @elseif(($transaksi->status->nama_status ?? '') === 'tiket terpakai')
+                                @elseif(($transaksi->status->nama_status ?? '') === 'terpakai')
                                     <span style="background-color:#d4edda;color:#155724;padding:4px 10px;border-radius:5px;display:inline-block;">{{ $transaksi->status->nama_status }}</span>
+                                @elseif(($transaksi->status->nama_status ?? '') === 'dibatalkan')
+                                    <span style="background-color:#fff3cd;color:#856404;padding:4px 10px;border-radius:5px;display:inline-block;">{{ $transaksi->status->nama_status }}</span>
                                 @else
                                     {{ $transaksi->status->nama_status ?? '-' }}
                                 @endif

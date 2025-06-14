@@ -64,6 +64,10 @@
 </div>
 @stop
 
+@section('css')
+    <link rel="stylesheet" href="/css/admin_custom.css">
+@stop
+
 @section('js')
 <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 <script>
@@ -80,6 +84,7 @@ document.addEventListener('DOMContentLoaded', function() {
             ctx.restore();
         }
     };
+
     var ctx = document.getElementById('transaksiChart').getContext('2d');
     var transaksiChart = new Chart(ctx, {
         type: 'line',
@@ -95,7 +100,7 @@ document.addEventListener('DOMContentLoaded', function() {
                 pointBackgroundColor: 'rgb(75, 192, 192)',
                 pointBorderColor: '#fff',
                 pointHoverRadius: 7,
-                tension: 0.3,
+                tension: 0,
                 fill: true
             }]
         },

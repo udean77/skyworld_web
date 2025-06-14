@@ -8,11 +8,12 @@ return new class extends Migration {
     {
         Schema::create('transaksis', function (Blueprint $table) {
             $table->id();
-            $table->unsignedBigInteger('customer_id');
-            $table->foreign('customer_id')->references('id')->on('customers')->onDelete('cascade');
-            $table->foreignId('wahana_id')->constrained()->onDelete('cascade');
-            $table->foreignId('status_id')->constrained('statuses')->onDelete('cascade');
+            $table->string('transaksi_id')->unique();
+            $table->string('kode_customer');
+            $table->foreign('kode_customer')->references('kode_customer')->on('customers');
+            $table->foreignId('wahana_id')->constrained('wahanas');
             $table->integer('jumlah_tiket');
+            $table->foreignId('status_id')->constrained('statuses');
             $table->timestamps();
         });
     }

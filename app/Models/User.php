@@ -47,11 +47,11 @@ class User extends Authenticatable
 
     public function role()
     {
-        return $this->belongsTo(\App\Models\Role::class);
+        return $this->belongsTo(Role::class);
     }
     
     public function isAdmin() {
-        return $this->role && in_array($this->role->nama_role, ['admin', 'superadmin', 'manager']);
+        return $this->role->nama_role === 'admin';
     }
 
     public function customer()

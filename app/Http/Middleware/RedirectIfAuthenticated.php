@@ -22,11 +22,14 @@ class RedirectIfAuthenticated
         foreach ($guards as $guard) {
             if (Auth::guard($guard)->check()) {
                 $user = Auth::guard($guard)->user();
-                if ($user && ($user->role === 'admin' || $user->role === 'superadmin' || $user->role === 'manager')) {
-                    return redirect('/dashboard');
-                } else {
-                    return redirect('/beranda');
+                
+                // Cek role_id untuk admin (1, 2, atau 3)
+                if ($user && ($user->role_id == 1 || $user->role_id == 2 || $user->role_id == 3)) {
+                    return redirect()->route('dashboard');
                 }
+                
+                // Jika bukan admin, redirect ke beranda customer
+                return redirect()->route('customer.beranda');
             }
         }
 
