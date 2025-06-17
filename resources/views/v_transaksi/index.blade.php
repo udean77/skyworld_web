@@ -8,9 +8,12 @@
                 <div class="card-header">
                     <h3 class="card-title">Daftar Transaksi</h3>
                     <div class="card-tools">
-                        <a href="{{ route('transaksis.laporan') }}" class="btn btn-primary">
-                            <i class="fas fa-print"></i> Cetak Laporan
-                        </a>
+                        <button type="button" class="btn btn-primary" id="cetakPdfBtn">
+                            <i class="fas fa-file-pdf"></i> Cetak PDF
+                        </button>
+                        <button type="button" class="btn btn-success ml-2" id="cetakExcelBtn">
+                            <i class="fas fa-file-excel"></i> Cetak Excel
+                        </button>
                     </div>
                 </div>
                 <div class="card-body">
@@ -165,6 +168,20 @@ $(document).ready(function() {
         e.preventDefault();
         let page = $(this).attr('href').split('page=')[1];
         loadTransactions($('#filterForm').serialize() + '&page=' + page);
+    });
+
+    // Handle Cetak PDF button click
+    $('#cetakPdfBtn').on('click', function() {
+        let params = $('#filterForm').serialize();
+        let url = '{{ route('transaksis.cetakPdf') }}' + ('?' + params);
+        window.open(url, '_blank');
+    });
+
+    // Handle Cetak Excel button click
+    $('#cetakExcelBtn').on('click', function() {
+        let params = $('#filterForm').serialize();
+        let url = '{{ route('transaksis.cetak-excel') }}' + ('?' + params);
+        window.open(url, '_blank');
     });
 
     // Function to load transactions

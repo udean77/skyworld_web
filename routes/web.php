@@ -52,12 +52,12 @@ Route::middleware(['auth', 'admin'])->group(function () {
     Route::get('/dashboard', [App\Http\Controllers\DashboardController::class, 'index'])->name('dashboard');
     // Rute CRUD wahana (admin hanya bisa akses)
     Route::resource('wahana', WahanaController::class)->except(['index']);
-    // Route transaksi untuk admin
-    Route::resource('transaksis', App\Http\Controllers\TransaksiController::class);
-    Route::get('/transaksis/laporan', [TransaksiController::class, 'laporan'])->name('transaksis.laporan');
+
+    // Route transaksi untuk admin - RUTE SPESIFIK DI ATAS RUTE RESOURCE
     Route::get('/transaksis/cetak', [TransaksiController::class, 'cetakLaporan'])->name('transaksis.cetak');
     Route::get('/transaksis/cetak-pdf', [TransaksiController::class, 'cetakPdf'])->name('transaksis.cetakPdf');
     Route::get('/transaksis/cetak-excel', [TransaksiController::class, 'cetakExcel'])->name('transaksis.cetak-excel');
+    Route::resource('transaksis', App\Http\Controllers\TransaksiController::class);
 });
 
 // =====================
@@ -92,7 +92,7 @@ Route::middleware(['auth.customer'])->group(function () {
     // Form pemesanan tiket
     Route::get('/customer/pesan-tiket', [CustomerTransaksiController::class, 'form'])->name('customer.pesan_tiket.form');
     Route::post('/customer/pesan-tiket', [CustomerTransaksiController::class, 'pesan'])->name('customer.transaksi.store');
-    Route::get('/customer/{customer_id}/riwayat', [CustomerTransaksiController::class, 'riwayat'])->name('customer.riwayat.withid');
+    Route::get('/customer/{kode_customer}/riwayat', [CustomerTransaksiController::class, 'riwayat'])->name('customer.riwayat.withid');
     Route::get('/customer/riwayat', [CustomerTransaksiController::class, 'riwayat'])->name('customer.riwayat');
     
     Route::get('/customer/transaksi/{id}/invoice', [CustomerTransaksiController::class, 'invoice'])->name('customer.transaksi.invoice');

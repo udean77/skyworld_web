@@ -78,7 +78,7 @@ class TransaksiController extends Controller
             });
         }
 
-        $transaksis = $query->latest()->paginate(10);
+        $transaksis = $query->latest()->paginate(6);
         $wahanas = Wahana::all();
         $statuses = Status::all();
 
@@ -123,12 +123,6 @@ class TransaksiController extends Controller
         return view('v_transaksi.show', compact('transaksi'));
     }
 
-    public function laporan()
-    {
-        $wahanas = Wahana::all();
-        $statuses = Status::all();
-        return view('v_transaksi.laporan', compact('wahanas', 'statuses'));
-    }
 
     public function cetakLaporan(Request $request)
     {
@@ -166,11 +160,41 @@ class TransaksiController extends Controller
         return view('v_transaksi.cetak_laporan', compact('transaksis', 'total_pendapatan', 'wahanas'));
     }
 
-    public function cetakPdf()
+    public function cetakPdf(Request $request)
     {
-        $transaksis = Transaksi::with(['customer', 'wahana', 'status'])->get();
+        $query = Transaksi::with(['customer', 'wahana', 'status']);
 
-        $pdf = PDF::loadView('v_transaksi.cetak_laporan', compact('transaksis'));
+        // Filter berdasarkan tanggal
+        if ($request->has('tanggal_awal') && $request->tanggal_awal != '') {
+            $query->whereDate('created_at', '>=', $request->tanggal_awal);
+        }
+        if ($request->has('tanggal_akhir') && $request->tanggal_akhir != '') {
+            $query->whereDate('created_at', '<=', $request->tanggal_akhir);
+        }
+
+        // Filter by status
+        if ($request->filled('status')) {
+            $query->whereHas('status', function($q) use ($request) {
+                $q->where('nama_status', $request->status);
+            });
+        }
+
+        // Filter by wahana
+        if ($request->filled('wahana')) {
+            $query->where('wahana_id', $request->wahana);
+        }
+
+        $transaksis = $query->get();
+
+        // Calculate total_pendapatan, similar to cetakLaporan
+        $total_pendapatan = $transaksis->reduce(function ($carry, $trx) {
+            return $carry + (($trx->wahana->harga ?? 0) * $trx->jumlah_tiket);
+        }, 0);
+
+        $wahanas = Wahana::all(); // Add this line
+        $user = auth()->user(); // Get authenticated user
+
+        $pdf = PDF::loadView('v_transaksi.cetak_laporan', compact('transaksis', 'wahanas', 'total_pendapatan', 'user')); // Add user to compact
         return $pdf->download('laporan-transaksi.pdf');
     }
 
@@ -185,9 +209,22 @@ class TransaksiController extends Controller
         $tanggal_awal = $request->tanggal_awal . ' 00:00:00';
         $tanggal_akhir = $request->tanggal_akhir . ' 23:59:59';
 
-        $transaksis = Transaksi::with(['wahana', 'customer', 'status'])
-            ->whereBetween('created_at', [$tanggal_awal, $tanggal_akhir])
-            ->get();
+        $query = Transaksi::with(['wahana', 'customer', 'status'])
+            ->whereBetween('created_at', [$tanggal_awal, $tanggal_akhir]);
+
+        // Filter by status
+        if ($request->filled('status')) {
+            $query->whereHas('status', function($q) use ($request) {
+                $q->where('nama_status', $request->status);
+            });
+        }
+
+        // Filter by wahana
+        if ($request->filled('wahana')) {
+            $query->where('wahana_id', $request->wahana);
+        }
+
+        $transaksis = $query->get();
 
         $data = [];
         $total_pendapatan = 0;

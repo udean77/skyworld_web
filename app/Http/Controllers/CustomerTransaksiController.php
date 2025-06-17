@@ -35,10 +35,11 @@ class CustomerTransaksiController extends Controller
 
         // Simpan transaksi dulu dengan status pending
         $transaksi = Transaksi::create([
-            'customer_id' => $customer->id,
+            'kode_customer' => $customer->kode_customer,
             'wahana_id' => $wahana->id,
             'status_id' => 3,
             'jumlah_tiket' => $request->jumlah_tiket,
+            'total_harga' => $wahana->harga * $request->jumlah_tiket
         ]);
 
         // Setup Midtrans config
@@ -68,14 +69,16 @@ class CustomerTransaksiController extends Controller
     }
 
 
-    // Riwayat transaksi customer
-    public function riwayat()
-    {
-        $customer = Auth::guard('customer')->user();
-        $transaksis = $customer->transaksis()->with(['wahana', 'status'])->latest()->get();
-        return view('customer.riwayat_transaksi', compact('transaksis'));
-    }
-
+      // Riwayat transaksi customer
+      public function riwayat()
+      {
+          $customer = Auth::guard('customer')->user();
+          $transaksis = Transaksi::where('kode_customer', $customer->kode_customer)
+              ->with(['wahana', 'status'])
+              ->latest()
+              ->get();
+          return view('customer.riwayat_transaksi', compact('transaksis'));
+      }
     // Cetak invoice transaksi
     public function invoice($id)
     {

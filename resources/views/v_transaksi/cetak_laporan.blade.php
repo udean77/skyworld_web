@@ -41,6 +41,12 @@
 <body>
     <h2>Laporan Transaksi Tiket</h2>
 
+    <div class="filter-info">
+        Dicetak oleh: {{ $user->name ?? 'Admin' }}
+        <br>
+        Tanggal Cetak: {{ now()->format('d-m-Y H:i:s') }}
+    </div>
+
     @if(request('status') || request('wahana'))
     <div class="filter-info">
         Filter: 

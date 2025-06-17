@@ -21,12 +21,10 @@ class AdminMiddleware
             return redirect('login');
         }
 
-        // Cek apakah user memiliki role admin (role_id 1, 2, atau 3)
         if ($request->user()->role_id == 1 || $request->user()->role_id == 2 || $request->user()->role_id == 3) {
             return $next($request);
         }
 
-        // Jika bukan admin, redirect ke beranda customer
         return redirect()->route('customer.beranda');
     }
 }

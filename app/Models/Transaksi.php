@@ -8,13 +8,17 @@ class Transaksi extends Model
 {
     use HasFactory;
 
+    protected $table = 'transaksis';
+    protected $primaryKey = 'id';
+    public $incrementing = true;
+
     protected $fillable = [
+        'transaksi_id',
         'kode_customer',
         'wahana_id',
-        'jumlah_tiket',
-        'tanggal_kunjungan',
         'status_id',
-        'transaksi_id'
+        'jumlah_tiket',
+        'total_harga',
     ];
 
     protected static function boot()

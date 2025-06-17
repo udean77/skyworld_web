@@ -10,16 +10,13 @@ return new class extends Migration
     {
         Schema::create('transaksis', function (Blueprint $table) {
             $table->id();
-            $table->foreignId('wahana_id')->constrained('wahanas')->onDelete('cascade');
-            $table->foreignId('customer_id')->constrained('customers')->onDelete('cascade');
+            $table->string('transaksi_id')->unique()->nullable();
+            $table->foreignId('wahana_id')->constrained('wahanas')->onDelete('cascade');        
+            $table->string('kode_customer'); // hanya pakai kode_customer, hapus customer_id
             $table->foreignId('status_id')->constrained('statuses')->onDelete('cascade');
             $table->integer('jumlah_tiket');
-            $table->decimal('total_harga', 10, 2);
+            $table->integer('total_harga')->nullable(); 
             $table->timestamps();
-        });
-
-        Schema::table('transaksis', function (Blueprint $table) {
-            $table->string('transaksi_id')->nullable()->after('id');
         });
 
         // Isi nilai transaksi_id untuk data yang sudah ada
@@ -28,18 +25,10 @@ return new class extends Migration
                 ->where('id', $transaksi->id)
                 ->update(['transaksi_id' => 'TRX-' . str_pad($transaksi->id, 6, '0', STR_PAD_LEFT)]);
         });
-
-        // Set unique constraint setelah mengisi data
-        Schema::table('transaksis', function (Blueprint $table) {
-            $table->unique('transaksi_id');
-        });
     }
 
     public function down(): void
     {
         Schema::dropIfExists('transaksis');
-        Schema::table('transaksis', function (Blueprint $table) {
-            $table->dropColumn('transaksi_id');
-        });
     }
-}; 
+};

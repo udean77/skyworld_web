@@ -3,11 +3,13 @@ namespace App\Http\Controllers;
 
 use App\Models\Customer;
 use App\Models\Wahana;
+use App\Models\Transaksi;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 
 class CustomerController extends Controller
 {
+
     public function index()
     {
         $customers = Customer::all();
@@ -77,18 +79,19 @@ class CustomerController extends Controller
     }
 
     // Proses login customer (pengunjung)
-  public function loginCustomer(Request $request)
-{
-    $credentials = $request->only('email', 'password');
+    public function loginCustomer(Request $request)
+    {
+        $credentials = $request->only('email', 'password');
 
-    if (Auth::guard('customer')->attempt($credentials)) {
-        // Tambahkan session ID untuk debug
-        session(['customer_id' => Auth::guard('customer')->id()]); // jika kamu masih butuh session
-        return redirect()->route('customer.beranda');
+        if (Auth::guard('customer')->attempt($credentials)) {
+            // Tambahkan session ID untuk debug
+            session(['customer_id' => Auth::guard('customer')->id()]); // jika kamu masih butuh session
+            return redirect()->route('customer.beranda');
+        }
+
+        return back()->with('error', 'Email atau password salah!');
     }
-
-    return back()->with('error', 'Email atau password salah!');
-}    public function logoutCustomer()
+    public function logoutCustomer()
     {
         Auth::guard('customer')->logout();
         return redirect()->route('customer.login');
@@ -104,5 +107,30 @@ class CustomerController extends Controller
     public function showLoginForm()
     {
         return view('customer.login');
+    }
+
+    // Riwayat transaksi customer
+    public function riwayat()
+    {
+        $customer = Auth::guard('customer')->user();
+        
+        // Debug: Cek data customer dan transaksi
+        \Log::info('Customer Data:', [
+            'kode_customer' => $customer->kode_customer,
+            'nama' => $customer->nama
+        ]);
+        
+        $transaksis = Transaksi::where('kode_customer', $customer->kode_customer)
+            ->with(['wahana', 'status'])
+            ->latest()
+            ->get();
+            
+        // Debug: Cek data transaksi
+        \Log::info('Transaksi Data:', [
+            'count' => $transaksis->count(),
+            'data' => $transaksis->toArray()
+        ]);
+
+        return view('customer.riwayat_transaksi', compact('transaksis'));
     }
 }
